@@ -20,9 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      final baseUrl = Platform.isAndroid  
-          ? 'http://10.0.2.2:8081'      // 안드로이드 에뮬레이터
-          : 'http://192.168.0.2:8081';   // 실제 기기나 다른 컴퓨터
+      final baseUrl = 'http://127.0.0.1:8081';
 
       try {
         final response = await http.post(
