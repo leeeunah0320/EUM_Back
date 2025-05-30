@@ -15,7 +15,9 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(unique = true)  // username은 고유해야 함
     private String username;
+    
     private String password;
     private String name;
     private String email;
