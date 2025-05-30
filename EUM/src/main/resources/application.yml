@@ -9,12 +9,24 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: update    # 테이블 자동 생성
+      ddl-auto: create    # update에서 create로 변경
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: leeah03200320@gmail.com
+    password: tfzj rewn avpx mtyg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 server:
   port: 8081 
