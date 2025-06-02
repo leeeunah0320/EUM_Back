@@ -3,6 +3,8 @@ package com.eum.controller;
 import com.eum.dto.MemberSignupRequest;
 import com.eum.dto.FindPasswordRequest;
 import com.eum.dto.LoginRequest;
+import com.eum.dto.EmailVerificationRequest;
+import com.eum.dto.EmailVerificationResponse;
 import com.eum.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,6 +58,36 @@ public class MemberController {
                 "status", "error",
                 "message", e.getMessage()
             ));
+        }
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestBody EmailVerificationRequest request) {
+        try {
+            EmailVerificationResponse response = memberService.sendVerificationEmail(request);
+            return ResponseEntity.ok(Map.of(
+                "message", "인증번호가 이메일로 전송되었습니다.",
+                "memberId", response.getMemberId(),
+                "verificationCode", response.getVerificationCode()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        
+        boolean isValid = memberService.verifyCode(email, code);
+        
+        if (isValid) {
+            return ResponseEntity.ok(Map.of("message", "인증 성공"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "잘못된 인증번호입니다."));
         }
     }
 } 
