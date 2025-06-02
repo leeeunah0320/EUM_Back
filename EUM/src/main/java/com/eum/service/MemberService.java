@@ -4,11 +4,14 @@ import com.eum.domain.Member;
 import com.eum.dto.MemberSignupRequest;
 import com.eum.dto.FindPasswordRequest;
 import com.eum.dto.LoginRequest;
+import com.eum.dto.EmailVerificationRequest;
+import com.eum.dto.EmailVerificationResponse;
 import com.eum.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JavaMailSender emailSender;
+    private final RedisService redisService;
     
     public void signup(MemberSignupRequest request) {
         // 아이디 중복 체크
@@ -57,5 +61,41 @@ public class MemberService {
         if (!member.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    public EmailVerificationResponse sendVerificationEmail(EmailVerificationRequest request) {
+        Member member = memberRepository.findByNameAndEmail(request.getName(), request.getEmail())
+            .orElseThrow(() -> new RuntimeException("일치하는 사용자가 없습니다."));
+
+        String verificationCode = String.format("%06d", new Random().nextInt(1000000));
+        
+        // Redis에 인증번호 저장 (5분 유효)
+        String redisKey = "verification:" + member.getEmail();
+        redisService.setDataWithExpiration(redisKey, verificationCode, 5);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(member.getEmail());
+        message.setSubject("EUM 아이디 찾기 인증번호");
+        message.setText("인증번호는 " + verificationCode + " 입니다.");
+        emailSender.send(message);
+
+        return EmailVerificationResponse.builder()
+            .memberId(member.getUsername())
+            .verificationCode(verificationCode)
+            .build();
+    }
+
+    // 인증번호 검증 메서드 추가
+    public boolean verifyCode(String email, String code) {
+        String redisKey = "verification:" + email;
+        String storedCode = redisService.getData(redisKey);
+        
+        if (storedCode != null && storedCode.equals(code)) {
+            redisService.deleteData(redisKey);
+            // 인증 성공 상태 저장
+            redisService.setVerifiedStatus(email);
+            return true;
+        }
+        return false;
     }
 } 
