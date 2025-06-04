@@ -92,10 +92,16 @@ public class MemberService {
         
         if (storedCode != null && storedCode.equals(code)) {
             redisService.deleteData(redisKey);
-            // 인증 성공 상태 저장
             redisService.setVerifiedStatus(email);
             return true;
         }
         return false;
+    }
+
+    // 이메일로 회원 아이디 찾기
+    public String findMemberIdByEmail(String email) {
+        Member member = memberRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("해당 이메일로 등록된 회원이 없습니다."));
+        return member.getUsername();
     }
 } 
