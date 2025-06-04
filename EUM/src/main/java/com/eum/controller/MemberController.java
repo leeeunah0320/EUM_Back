@@ -85,7 +85,11 @@ public class MemberController {
         boolean isValid = memberService.verifyCode(email, code);
         
         if (isValid) {
-            return ResponseEntity.ok(Map.of("message", "인증 성공"));
+            String memberId = memberService.findMemberIdByEmail(email);
+            return ResponseEntity.ok(Map.of(
+                "message", "인증 성공",
+                "memberId", memberId
+            ));
         } else {
             return ResponseEntity.badRequest().body(Map.of("message", "잘못된 인증번호입니다."));
         }
