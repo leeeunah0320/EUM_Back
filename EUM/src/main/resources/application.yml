@@ -9,7 +9,7 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: create    # update에서 create로 변경
+      ddl-auto: update    # create에서 update로 변경
     show-sql: true
     properties:
       hibernate:
