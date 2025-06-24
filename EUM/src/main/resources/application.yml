@@ -29,7 +29,49 @@ spring:
   redis:
     host: localhost
     port: 6379
-
+  
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 790739370157-1iq5b7eo5ckva22i3ac2u505deqflfpk.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          naver:
+            client-id: xwbD6BTZipM9D9K4osZ7
+            client-secret: 4VNsc1YxDI
+            client-name: Naver
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - name
+              - email
+              - profile_image
+        provider:
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
 
 server:
-  port: 8081 
+  port: 8081
+
+# JWT 설정
+jwt:
+  secret: your-super-secret-jwt-key-here-make-it-long-enough-for-security-at-least-256-bits
+  expiration: 86400000  # 24시간 (밀리초)
+
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security.oauth2: TRACE
+    org.springframework.security.oauth2.client: TRACE
+    org.springframework.security.oauth2.client.registration: TRACE
+    com.eum: DEBUG
+    root: INFO 
