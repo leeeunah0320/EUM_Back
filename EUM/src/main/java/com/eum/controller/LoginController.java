@@ -34,18 +34,30 @@ public class LoginController {
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model) {
         if (principal != null) {
-            // 사용자 정보 추출
-            String email = principal.getAttribute("email");
-            String name = principal.getAttribute("name");
-            String picture = principal.getAttribute("picture");
-            String googleId = principal.getName(); // Google ID
-            
+            String email = null;
+            String name = null;
+            String picture = null;
+            String socialId = null;
+
+            // 네이버 로그인 사용자인 경우
+            Object naverResponse = principal.getAttribute("response");
+            if (naverResponse instanceof Map naverMap) {
+                email = (String) naverMap.get("email");
+                name = (String) naverMap.get("name");
+                picture = (String) naverMap.get("profile_image");
+                socialId = (String) naverMap.get("id");
+            } else {
+                // 구글 등 기본 OAuth2 사용자
+                email = principal.getAttribute("email");
+                name = principal.getAttribute("name");
+                picture = principal.getAttribute("picture");
+                socialId = principal.getName();
+            }
+
             // DB에 사용자 정보 저장/업데이트
-            User user = userService.findOrCreateUser(email, name, picture, googleId);
-            
+            User user = userService.findOrCreateUser(email, name, picture, socialId);
             // JWT 토큰 생성
             String token = jwtService.generateToken(user.getEmail(), user.getName(), user.getRole().name());
-            
             // 모델에 정보 추가
             model.addAttribute("userName", user.getName());
             model.addAttribute("userEmail", user.getEmail());
@@ -60,15 +72,25 @@ public class LoginController {
     @ResponseBody
     public Map<String, Object> getToken(@AuthenticationPrincipal OAuth2User principal) {
         Map<String, Object> response = new HashMap<>();
-        
         if (principal != null) {
-            String email = principal.getAttribute("email");
-            String name = principal.getAttribute("name");
-            String googleId = principal.getName();
-            
-            User user = userService.findOrCreateUser(email, name, principal.getAttribute("picture"), googleId);
+            String email = null;
+            String name = null;
+            String picture = null;
+            String socialId = null;
+            Object naverResponse = principal.getAttribute("response");
+            if (naverResponse instanceof Map naverMap) {
+                email = (String) naverMap.get("email");
+                name = (String) naverMap.get("name");
+                picture = (String) naverMap.get("profile_image");
+                socialId = (String) naverMap.get("id");
+            } else {
+                email = principal.getAttribute("email");
+                name = principal.getAttribute("name");
+                picture = principal.getAttribute("picture");
+                socialId = principal.getName();
+            }
+            User user = userService.findOrCreateUser(email, name, picture, socialId);
             String token = jwtService.generateToken(user.getEmail(), user.getName(), user.getRole().name());
-            
             response.put("success", true);
             response.put("token", token);
             response.put("user", Map.of(
@@ -82,7 +104,6 @@ public class LoginController {
             response.put("success", false);
             response.put("message", "인증되지 않은 사용자");
         }
-        
         return response;
     }
 } 
