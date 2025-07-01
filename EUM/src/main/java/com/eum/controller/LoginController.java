@@ -39,20 +39,11 @@ public class LoginController {
             String picture = null;
             String socialId = null;
 
-            // 네이버 로그인 사용자인 경우
-            Object naverResponse = principal.getAttribute("response");
-            if (naverResponse instanceof Map naverMap) {
-                email = (String) naverMap.get("email");
-                name = (String) naverMap.get("name");
-                picture = (String) naverMap.get("profile_image");
-                socialId = (String) naverMap.get("id");
-            } else {
-                // 구글 등 기본 OAuth2 사용자
-                email = principal.getAttribute("email");
-                name = principal.getAttribute("name");
-                picture = principal.getAttribute("picture");
-                socialId = principal.getName();
-            }
+            // 구글 등 기본 OAuth2 사용자
+            email = principal.getAttribute("email");
+            name = principal.getAttribute("name");
+            picture = principal.getAttribute("picture");
+            socialId = principal.getName();
 
             // DB에 사용자 정보 저장/업데이트
             User user = userService.findOrCreateUser(email, name, picture, socialId);
@@ -77,18 +68,13 @@ public class LoginController {
             String name = null;
             String picture = null;
             String socialId = null;
-            Object naverResponse = principal.getAttribute("response");
-            if (naverResponse instanceof Map naverMap) {
-                email = (String) naverMap.get("email");
-                name = (String) naverMap.get("name");
-                picture = (String) naverMap.get("profile_image");
-                socialId = (String) naverMap.get("id");
-            } else {
-                email = principal.getAttribute("email");
-                name = principal.getAttribute("name");
-                picture = principal.getAttribute("picture");
-                socialId = principal.getName();
-            }
+
+            // 구글 등 기본 OAuth2 사용자
+            email = principal.getAttribute("email");
+            name = principal.getAttribute("name");
+            picture = principal.getAttribute("picture");
+            socialId = principal.getName();
+
             User user = userService.findOrCreateUser(email, name, picture, socialId);
             String token = jwtService.generateToken(user.getEmail(), user.getName(), user.getRole().name());
             response.put("success", true);
