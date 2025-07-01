@@ -31,6 +31,9 @@ public class User {
     @Column(name = "google_id", unique = true)
     private String googleId;
     
+    @Column(name = "provider")
+    private String provider; // "google", "naver" 등
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;
