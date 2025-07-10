@@ -66,3 +66,13 @@ logging:
     org.springframework.security.oauth2.client.registration: TRACE
     com.eum: DEBUG
     root: INFO 
+
+# AWS 설정
+aws:
+  access-key-id: AKIAUHBBA5WFGBTL7UQT
+  secret-access-key: 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
+  region: us-east-1
+  rekognition:
+    project-version-arn: arn:aws:rekognition:us-east-1:289979559306:project/EUM/version/EUM.2025-07-04T18.35.53/1751621754095
+    min-confidence: 10.0
+ 
