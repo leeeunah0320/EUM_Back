@@ -46,6 +46,19 @@ dependencies {
     implementation 'software.amazon.awssdk:rekognition:2.24.12'
     implementation 'software.amazon.awssdk:translate:2.24.12'
     implementation 'software.amazon.awssdk:polly:2.24.12'
+    
+    // AI 챗봇 관련 의존성
+    // Google Places API
+    implementation 'com.google.maps:google-maps-services:2.2.0'
+    
+    // STT (Speech-to-Text) 관련
+    implementation 'com.google.cloud:google-cloud-speech:4.8.0'
+    
+    // HTTP 클라이언트
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    
+    // JSON 처리
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 test {
