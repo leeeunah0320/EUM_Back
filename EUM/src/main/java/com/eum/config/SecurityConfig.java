@@ -16,7 +16,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/login", "/oauth2/**", "/error", "/api/auth/**", "/api/members/**", "/api/ocr/**", "/rekognition/test", "/ocr.html").permitAll()
+            .requestMatchers("/", "/login", "/oauth2/**", "/error", "/api/auth/**", "/api/members/**", "/api/ocr/**", "/rekognition/test", "/ocr.html", "/chatbot.html", "/api/chatbot/**").permitAll()
             .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
