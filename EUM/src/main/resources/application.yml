@@ -75,4 +75,23 @@ aws:
   rekognition:
     project-version-arn: arn:aws:rekognition:us-east-1:289979559306:project/EUM/version/EUM.2025-07-04T18.35.53/1751621754095
     min-confidence: 10.0
- 
+
+# AI 챗봇 설정
+ai:
+  gemini:
+    api-key: AIzaSyCtjkzJxBa28KinN5LKvnv--A1tTKbgMrY
+    model: gemini-1.5-flash
+    max-tokens: 1000
+    temperature: 0.7
+  
+  google-places:
+    api-key: AIzaSyCP8nP2QjARNsaR0UwNqRPyLze-zaxrAGA
+    base-url: https://maps.googleapis.com/maps/api/place
+  
+  speech-to-text:
+    google-cloud:
+      project-id: eumproject
+      credentials-file: D:/eumproject-d3f29bcd9867.json
+      language-code: ko-KR
+      encoding: WEBM_OPUS
+      sample-rate-hertz: 48000 
