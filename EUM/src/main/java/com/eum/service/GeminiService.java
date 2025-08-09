@@ -124,6 +124,16 @@ public class GeminiService {
      */
     public String analyzeIntent(String userQuery) {
         try {
+            // 장소 검색 관련 키워드 직접 체크
+            String lowerQuery = userQuery.toLowerCase();
+            if (lowerQuery.contains("맛집") || lowerQuery.contains("카페") || lowerQuery.contains("식당") ||
+                lowerQuery.contains("추천") || lowerQuery.contains("찾아") || lowerQuery.contains("알려") ||
+                lowerQuery.contains("근처") || lowerQuery.contains("주변") || lowerQuery.contains("역") ||
+                lowerQuery.contains("구") || lowerQuery.contains("동") || lowerQuery.contains("가")) {
+                log.info("장소 검색 키워드 감지: {}", userQuery);
+                return "PLACE_SEARCH";
+            }
+            
             String intentAnalysisPrompt = String.format(
                 "다음 사용자 쿼리의 의도를 분석해주세요. " +
                 "가능한 의도: PLACE_SEARCH(장소 검색), INFORMATION_REQUEST(정보 요청), GENERAL_CHAT(일반 대화), UNKNOWN(알 수 없음)\n\n" +
