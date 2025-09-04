@@ -33,6 +33,8 @@ public class SpeechToTextService {
      */
     public String convertAudioToText(String base64AudioData) {
         try {
+            log.info("STT 변환 시작");
+            
             // Base64 디코딩
             byte[] audioBytes = Base64.getDecoder().decode(base64AudioData);
             
@@ -68,8 +70,9 @@ public class SpeechToTextService {
                     }
                 }
 
-                log.info("STT 변환 결과: {}", transcript.toString());
-                return transcript.toString();
+                String result = transcript.toString();
+                log.info("STT 변환 결과: {}", result);
+                return result;
 
             } catch (IOException e) {
                 log.error("SpeechClient 생성 중 오류 발생", e);
@@ -78,9 +81,18 @@ public class SpeechToTextService {
 
         } catch (Exception e) {
             log.error("오디오를 텍스트로 변환하는 중 오류 발생", e);
-            // STT 실패 시 테스트용 응답 반환
-            log.warn("STT 서비스가 사용할 수 없습니다. 테스트 모드로 작동합니다.");
-            return "음성 인식 서비스가 현재 사용할 수 없습니다. 텍스트로 입력해주세요.";
+            
+            // 구체적인 에러 메시지 제공
+            if (e.getMessage() != null && e.getMessage().contains("billing")) {
+                log.warn("Google Cloud Speech-to-Text API 결제가 활성화되지 않았습니다.");
+                return "음성 인식 서비스를 사용하려면 Google Cloud 결제 설정이 필요합니다. 현재는 텍스트 입력을 사용해주세요.";
+            } else if (e.getMessage() != null && e.getMessage().contains("PERMISSION_DENIED")) {
+                log.warn("Google Cloud Speech-to-Text API 권한이 없습니다.");
+                return "음성 인식 서비스 권한이 설정되지 않았습니다. 현재는 텍스트 입력을 사용해주세요.";
+            } else {
+                log.warn("STT 서비스가 사용할 수 없습니다. 테스트 모드로 작동합니다.");
+                return "음성 인식 서비스에 일시적인 문제가 발생했습니다. 텍스트로 입력해주세요.";
+            }
         }
     }
 
@@ -102,4 +114,4 @@ public class SpeechToTextService {
             return false;
         }
     }
-} 
+}
