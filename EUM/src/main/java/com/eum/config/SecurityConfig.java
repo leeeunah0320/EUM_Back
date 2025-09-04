@@ -18,7 +18,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/login", "/oauth2/**", "/error", "/api/auth/**", "/api/members/**", "/api/ocr/**", "/rekognition/test", 
                            "/ocr.html", "/chatbot.html", "/places.html", "/integrated-test.html", "/index.html",
-                           "/api/chatbot/**", "/api/places/**", "/api/tts/**", "/test-chatbot.html").permitAll()
+                           "/api/chatbot/**", "/api/places/**", "/api/tts/**", "/test-chatbot.html","/test-gemini.html","/json-test.html",
+                           "/chatbot-test.html").permitAll()
             .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
