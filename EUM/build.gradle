@@ -46,6 +46,7 @@ dependencies {
     implementation 'software.amazon.awssdk:rekognition:2.24.12'
     implementation 'software.amazon.awssdk:translate:2.24.12'
     implementation 'software.amazon.awssdk:polly:2.24.12'
+    implementation 'software.amazon.awssdk:bedrockruntime:2.24.12'
     
     // AI 챗봇 관련 의존성
     // Google Places API
