@@ -53,90 +53,84 @@ public class ChatbotController {
     }
 
     /**
+     * STT 전용 엔드포인트
+     */
+    @PostMapping("/stt")
+    public ResponseEntity<Map<String, Object>> convertSpeechToText(@RequestBody ChatbotRequest request) {
+        try {
+            log.info("STT 요청 수신: sessionId={}", request.getSessionId());
+
+            String audioData = request.getAudioData();
+            if (audioData == null || audioData.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "errorMessage", "오디오 데이터가 필요합니다."));
+            }
+
+            // STT 서비스 호출
+            String convertedText = chatbotService.convertAudioToText(audioData);
+            
+            if (convertedText != null && !convertedText.trim().isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "text", convertedText,
+                        "sessionId", request.getSessionId()
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "success", false,
+                        "errorMessage", "STT 변환에 실패했습니다.",
+                        "sessionId", request.getSessionId()
+                ));
+            }
+
+        } catch (Exception e) {
+            log.error("STT 요청 처리 중 오류 발생", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("success", false, "errorMessage", "STT 처리 중 오류가 발생했습니다."));
+        }
+    }
+
+    /**
      * 서비스 상태 확인 엔드포인트
      */
     @GetMapping("/status")
-    public ResponseEntity<Object> getServiceStatus() {
+    public ResponseEntity<Map<String, Object>> getServiceStatus() {
         try {
-            boolean isAvailable = chatbotService.isServiceAvailable();
-            
-            return ResponseEntity.ok(Map.of(
-                "available", isAvailable,
-                "message", isAvailable ? "서비스가 정상적으로 작동 중입니다." : "서비스 설정이 완료되지 않았습니다."
-            ));
-
+            Map<String, Object> status = chatbotService.getServiceStatus();
+            return ResponseEntity.ok(status);
         } catch (Exception e) {
             log.error("서비스 상태 확인 중 오류 발생", e);
-            return ResponseEntity.internalServerError().body(Map.of(
-                "available", false,
-                "message", "서비스 상태 확인 중 오류가 발생했습니다."
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "서비스 상태를 확인할 수 없습니다."));
+        }
+    }
+
+    /**
+     * 테스트용 엔드포인트
+     */
+    @PostMapping("/test")
+    public ResponseEntity<Map<String, Object>> test(@RequestBody Map<String, String> request) {
+        try {
+            String message = request.get("message");
+            log.info("테스트 요청: {}", message);
+
+            ChatbotRequest chatbotRequest = new ChatbotRequest();
+            chatbotRequest.setMessage(message);
+            chatbotRequest.setSessionId(UUID.randomUUID().toString());
+
+            ChatbotResponse response = chatbotService.processChatbotRequest(chatbotRequest);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", response.isSuccess(),
+                    "message", response.getMessage(),
+                    "intent", response.getIntent(),
+                    "extractedInfo", response.getExtractedInfo()
             ));
-        }
-    }
-
-    /**
-     * 텍스트만으로 챗봇과 대화
-     */
-    @PostMapping("/text")
-    public ResponseEntity<ChatbotResponse> textChat(@RequestBody ChatbotRequest request) {
-        try {
-            log.info("텍스트 챗봇 요청 수신: message={}", request.getMessage());
-
-            // 세션 ID가 없으면 생성
-            if (request.getSessionId() == null || request.getSessionId().trim().isEmpty()) {
-                request.setSessionId(UUID.randomUUID().toString());
-            }
-
-            // 오디오 데이터는 무시하고 텍스트만 처리
-            request.setAudioData(null);
-
-            ChatbotResponse response = chatbotService.processChatbotRequest(request);
-
-            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            log.error("텍스트 챗봇 요청 처리 중 오류 발생", e);
-            
-            ChatbotResponse errorResponse = ChatbotResponse.builder()
-                    .success(false)
-                    .errorMessage("텍스트 처리 중 오류가 발생했습니다.")
-                    .sessionId(request.getSessionId())
-                    .build();
-
-            return ResponseEntity.internalServerError().body(errorResponse);
+            log.error("테스트 요청 처리 중 오류 발생", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "테스트 처리 중 오류가 발생했습니다."));
         }
     }
-
-    /**
-     * 오디오 데이터로 챗봇과 대화
-     */
-    @PostMapping("/voice")
-    public ResponseEntity<ChatbotResponse> voiceChat(@RequestBody ChatbotRequest request) {
-        try {
-            log.info("음성 챗봇 요청 수신: sessionId={}", request.getSessionId());
-
-            // 세션 ID가 없으면 생성
-            if (request.getSessionId() == null || request.getSessionId().trim().isEmpty()) {
-                request.setSessionId(UUID.randomUUID().toString());
-            }
-
-            // 텍스트 메시지는 무시하고 오디오 데이터만 처리
-            request.setMessage(null);
-
-            ChatbotResponse response = chatbotService.processChatbotRequest(request);
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            log.error("음성 챗봇 요청 처리 중 오류 발생", e);
-            
-            ChatbotResponse errorResponse = ChatbotResponse.builder()
-                    .success(false)
-                    .errorMessage("음성 처리 중 오류가 발생했습니다.")
-                    .sessionId(request.getSessionId())
-                    .build();
-
-            return ResponseEntity.internalServerError().body(errorResponse);
-        }
-    }
-} 
+}
