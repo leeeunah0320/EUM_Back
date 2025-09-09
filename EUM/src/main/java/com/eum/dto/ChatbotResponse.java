@@ -13,6 +13,5 @@ public class ChatbotResponse {
     private String sessionId;
     private boolean success;
     private String errorMessage;
-    private TtsResponse ttsResponse;
-    private PlacesSearchResponse placesResponse;
-} 
+    private ExtractedInfo extractedInfo;
+}
