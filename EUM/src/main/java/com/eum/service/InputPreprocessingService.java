@@ -85,7 +85,20 @@ public class InputPreprocessingService {
     private String extractLocation(String query) {
         String lowerQuery = query.toLowerCase();
         
-        // 1. 명시적인 위치 키워드 검색
+        // 1. 주요 지명 패턴 매칭 (우선순위 높음)
+        String[] majorLocations = {
+            "강남역", "홍대", "신촌", "이태원", "압구정", "청담", "삼성역", "역삼역", 
+            "선릉역", "논현역", "신사역", "강남구", "서초구", "송파구", "마포구", 
+            "용산구", "영등포구", "여의도", "잠실", "건대", "성수", "왕십리"
+        };
+        
+        for (String location : majorLocations) {
+            if (lowerQuery.contains(location.toLowerCase())) {
+                return location;
+            }
+        }
+        
+        // 2. 명시적인 위치 키워드 검색
         for (String locationKeyword : LOCATION_KEYWORDS) {
             if (lowerQuery.contains(locationKeyword)) {
                 // 위치 키워드 주변의 텍스트 추출
@@ -96,7 +109,7 @@ public class InputPreprocessingService {
             }
         }
 
-        // 2. 정규표현식을 사용한 위치 패턴 매칭
+        // 3. 정규표현식을 사용한 위치 패턴 매칭
         String location = extractLocationByPattern(query);
         if (location != null && !location.trim().isEmpty()) {
             return location;
