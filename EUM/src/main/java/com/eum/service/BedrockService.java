@@ -131,14 +131,32 @@ public class BedrockService {
     public String analyzeIntent(String userQuery) {
         try {
             String intentAnalysisPrompt = String.format(
-                "다음 사용자 쿼리의 의도를 분석해주세요. " +
-                "가능한 의도: PLACE_SEARCH(장소 검색), INFORMATION_REQUEST(정보 요청), GENERAL_CHAT(일반 대화), UNKNOWN(알 수 없음)\n\n" +
-                "응답은 의도만 반환해주세요 (예: PLACE_SEARCH)\n\n" +
+                "다음 사용자 쿼리의 의도를 분석해주세요.\n\n" +
+                "의도 분류:\n" +
+                "- PLACE_SEARCH: 장소 검색, 맛집 추천, 카페 찾기, 호텔 예약, 병원 찾기 등\n" +
+                "- INFORMATION_REQUEST: 일반적인 정보 요청, 질문\n" +
+                "- GENERAL_CHAT: 인사, 감사, 일반 대화\n" +
+                "- UNKNOWN: 의도를 파악하기 어려운 경우\n\n" +
+                "예시:\n" +
+                "- '강남역 맛집 추천해줘' → PLACE_SEARCH\n" +
+                "- '홍대 카페 어디가 좋아?' → PLACE_SEARCH\n" +
+                "- '날씨가 어때?' → INFORMATION_REQUEST\n" +
+                "- '안녕하세요' → GENERAL_CHAT\n\n" +
+                "응답은 반드시 다음 중 하나만 반환하세요: PLACE_SEARCH, INFORMATION_REQUEST, GENERAL_CHAT, UNKNOWN\n\n" +
                 "사용자 쿼리: %s",
                 userQuery
             );
 
             String intent = sendQueryToBedrock(intentAnalysisPrompt);
+            // 응답에서 의도만 추출 (공백 제거)
+            intent = intent.trim().toUpperCase();
+            
+            // 유효한 의도인지 확인
+            if (!intent.equals("PLACE_SEARCH") && !intent.equals("INFORMATION_REQUEST") && 
+                !intent.equals("GENERAL_CHAT") && !intent.equals("UNKNOWN")) {
+                intent = "UNKNOWN";
+            }
+            
             log.info("의도 분석 결과: {} -> {}", userQuery, intent);
             return intent;
 
