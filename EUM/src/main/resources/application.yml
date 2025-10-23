@@ -69,29 +69,29 @@ logging:
 
 # AWS 설정
 aws:
-  access-key-id: AKIAUHBBA5WFGBTL7UQT
-  secret-access-key: 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
+  access-key-id: AKIAUHBBA5WFHS7W2C7F
+  secret-access-key: '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'
   region: us-east-1
   rekognition:
     project-version-arn: arn:aws:rekognition:us-east-1:289979559306:project/EUM/version/EUM.2025-07-04T18.35.53/1751621754095
     min-confidence: 10.0
+  bedrock:
+    model-id: amazon.titan-text-express-v1
+    max-tokens: 1000
+    temperature: 0.7
 
 # AI 챗봇 설정
 ai:
-  gemini:
-    api-key: AIzaSyCtjkzJxBa28KinN5LKvnv--A1tTKbgMrY
-    model: gemini-1.5-flash
-    max-tokens: 1000
-    temperature: 0.7
-  
-  google-places:
-    api-key: AIzaSyCP8nP2QjARNsaR0UwNqRPyLze-zaxrAGA
-    base-url: https://maps.googleapis.com/maps/api/place
-  
   speech-to-text:
     google-cloud:
       project-id: eumproject
       credentials-file: D:/eumproject-d3f29bcd9867.json
       language-code: ko-KR
       encoding: WEBM_OPUS
-      sample-rate-hertz: 48000 
+      sample-rate-hertz: 48000
+
+# Google Places API 설정
+google:
+  places:
+    api-key: AIzaSyBlD_yqF9HHWYGKAz9snD6idsP3nQ70SOk  # 실제 Google Places API 키로 교체하세요
+    base-url: https://maps.googleapis.com/maps/api/place
